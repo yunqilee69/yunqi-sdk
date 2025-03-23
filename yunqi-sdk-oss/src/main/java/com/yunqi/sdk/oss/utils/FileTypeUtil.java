@@ -1,11 +1,14 @@
 package com.yunqi.sdk.oss.utils;
 
+import com.sun.corba.se.spi.monitoring.MonitoredAttributeInfo;
 import com.yunqi.sdk.oss.exception.NotFoundFileTypeException;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class FileTypeUtil {
 
@@ -13,8 +16,10 @@ public class FileTypeUtil {
 
     // 默认文件类型为txt
     private static final String DEFAULT_TYPE = "txt";
-    
+
     static {
+        // txt无固定魔数，直接设置txt确保无法被16进制数匹配到
+        MAGIC_NUMBER_MAP.put(DEFAULT_TYPE, "txt");
         // images
         MAGIC_NUMBER_MAP.put("FFD8FF", "jpeg");
         MAGIC_NUMBER_MAP.put("89504E47", "png");
@@ -51,7 +56,7 @@ public class FileTypeUtil {
     public static String getFileType(InputStream inputStream) {
         String val = MAGIC_NUMBER_MAP.get(getFileHeader(inputStream));
         if (val == null) {
-            throw new NotFoundFileTypeException();
+            return DEFAULT_TYPE;
         }
         for (Map.Entry<String, String> entry : MAGIC_NUMBER_MAP.entrySet()) {
             if (val.startsWith(entry.getKey())) {
@@ -100,5 +105,15 @@ public class FileTypeUtil {
             builder.append(hv);
         }
         return builder.toString();
+    }
+
+    /**
+     * 获取所能判断的文件类型列表
+     * @return
+     */
+    public static List<String> getFileTypeList() {
+        return MAGIC_NUMBER_MAP.entrySet().stream()
+                .map(Map.Entry::getValue)
+                .collect(Collectors.toList());
     }
 }
