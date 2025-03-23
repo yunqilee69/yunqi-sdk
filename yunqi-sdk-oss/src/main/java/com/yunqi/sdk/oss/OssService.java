@@ -38,7 +38,7 @@ public interface OssService {
     URL getCommonUrl(String objName);
 
     /**
-     * 获取预签名的url，过期时间默认为6个小时
+     * 获取预签名的url，过期时间默认为1天
      * @param objName
      * @return
      */

@@ -7,10 +7,12 @@ import com.aliyun.oss.OSSClientBuilder;
 import com.aliyun.oss.model.OSSObject;
 import com.aliyun.oss.model.PutObjectResult;
 import com.yunqi.sdk.oss.OssService;
+import com.yunqi.sdk.oss.constants.UrlConstant;
 import com.yunqi.sdk.oss.exception.ObjNameInvalidException;
 import com.yunqi.sdk.oss.exception.OssException;
 import com.yunqi.sdk.oss.exception.UploadFileException;
 import com.yunqi.sdk.oss.utils.FileTypeUtil;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -22,6 +24,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
+@Slf4j
 public class AliyunOssService implements OssService {
 
     private final OSS ossClient;
@@ -61,7 +64,9 @@ public class AliyunOssService implements OssService {
             throw new UploadFileException();
         }
 
-        return getCommonUrl(objName);
+        URL url = getCommonUrl(objName);
+        log.info("文件上传成功,访问地址为：{}", url.toString());
+        return url;
     }
 
     @Override
@@ -80,8 +85,7 @@ public class AliyunOssService implements OssService {
             // 返回一个新的 ByteArrayInputStream
             return new ByteArrayInputStream(buffer.toByteArray());
         } catch (IOException e) {
-            System.err.println("Error reading object content: " + e.getMessage());
-            return null;
+            throw new OssException(e);
         }
     }
 
@@ -98,7 +102,7 @@ public class AliyunOssService implements OssService {
 
     @Override
     public URL getPresignedUrl(String objName) {
-        Date expiration = new Date(System.currentTimeMillis() + 3600 * 1000);
+        Date expiration = new Date(System.currentTimeMillis() + UrlConstant.PRESIGNED_URL_EXPIRATION);
         return getPresignedUrl(objName, expiration);
     }
 
