@@ -1,5 +1,6 @@
 package com.yunqi.sdk.oss.aliyun;
 
+import com.aliyun.oss.ClientBuilderConfiguration;
 import com.aliyun.oss.ClientException;
 import com.aliyun.oss.OSS;
 import com.aliyun.oss.OSSClientBuilder;
@@ -29,11 +30,10 @@ public class AliyunOssService implements OssService {
 
     private final String bucketName;
 
-    public AliyunOssService(String endpoint, String accessKeyId, String accessKeySecret, String bucket) {
+    public AliyunOssService(String endpoint, String bucket, OSS ossClient) {
         this.bucketName = bucket;
         this.endpoint = endpoint;
-        OSSClientBuilder ossClientBuilder = new OSSClientBuilder();
-        this.ossClient = ossClientBuilder.build(endpoint, accessKeyId, accessKeySecret);
+        this.ossClient = ossClient;
     }
 
     @Override

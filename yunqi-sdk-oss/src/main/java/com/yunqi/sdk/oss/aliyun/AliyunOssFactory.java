@@ -1,5 +1,7 @@
 package com.yunqi.sdk.oss.aliyun;
 
+import com.aliyun.oss.OSS;
+import com.aliyun.oss.OSSClientBuilder;
 import com.yunqi.sdk.oss.OssAbstractFactory;
 import com.yunqi.sdk.oss.OssEnvParam;
 import com.yunqi.sdk.oss.OssService;
@@ -9,7 +11,7 @@ import com.yunqi.sdk.oss.OssService;
  */
 public class AliyunOssFactory extends OssAbstractFactory {
 
-    private OssService ossService;
+    private static OssService ossService;
 
     /**
      * 返回AliyunOssService
@@ -17,18 +19,21 @@ public class AliyunOssFactory extends OssAbstractFactory {
      */
     @Override
     public OssService getOssService(OssEnvParam envParam) {
-        if (this.ossService != null) {
-            return this.ossService;
+        if (ossService != null) {
+            return ossService;
         }
         // 单例模式，防止重复创建
         synchronized (this) {
-            if (this.ossService == null) {
-                this.ossService = new AliyunOssService(envParam.getEndpoint(),
+            if (ossService == null) {
+                OSSClientBuilder ossClientBuilder = new OSSClientBuilder();
+                OSS ossClient = ossClientBuilder.build(envParam.getEndpoint(),
                         envParam.getAccessKey(),
-                        envParam.getSecretKey(),
-                        envParam.getBucket());
+                        envParam.getSecretKey());
+                ossService = new AliyunOssService(envParam.getEndpoint(),
+                        envParam.getBucket(),
+                        ossClient);
             }
-            return this.ossService;
+            return ossService;
         }
     }
 }
